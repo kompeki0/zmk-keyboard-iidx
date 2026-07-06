@@ -81,7 +81,7 @@
         compatible = "zmk,keymap";
         default_layer {
             bindings = <
-                &kp Z &kp X &kp C &kp V &kp S &kp D &kp F &kp Q &kp W
+                &kp V &kp C &kp X &kp Z &kp F &kp D &kp S &kp W &kp Q
             >;
             sensor-bindings = <&enc_hold_r>;
         };
