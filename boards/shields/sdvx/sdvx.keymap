@@ -16,8 +16,8 @@
             require-top-layer;
 
             bindings = <
-                &kp L   /* hold_cw  */
-                &kp SEMICOLON   /* hold_ccw */
+                &kp LSHFT   /* hold_cw  */
+                &kp LCTRL   /* hold_ccw */
                 &none    /* step_cw  */
                 &none   /* step_ccw */
             >;
@@ -81,7 +81,7 @@
         compatible = "zmk,keymap";
         default_layer {
             bindings = <
-                &kp F &kp D &kp S &kp A &kp R &kp E &kp W &kp T &kp G
+                &kp Z &kp X &kp C &kp V &kp S &kp D &kp F &kp Q &kp W
             >;
             sensor-bindings = <&enc_hold_r>;
         };
