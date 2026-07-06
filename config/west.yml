@@ -1,0 +1,27 @@
+manifest:
+  remotes:
+    - name: zmkfirmware
+      url-base: https://github.com/zmkfirmware
+    - name: kompeki0
+      url-base: https://github.com/kompeki0
+  projects:
+    - name: zmk
+      remote: zmkfirmware
+      revision: main
+      clone-depth: 1
+      import:
+        file: app/west.yml
+    - name: zmk-cornix-for-sdvx
+      remote: kompeki0
+      revision: main
+      clone-depth: 1
+    - name: zmk-variables
+      remote: kompeki0
+      revision: main
+      clone-depth: 1
+    - name: zmk-sensor-rotate-tools
+      remote: kompeki0
+      revision: main
+      clone-depth: 1
+  self:
+    path: config

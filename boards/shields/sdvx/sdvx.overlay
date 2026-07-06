@@ -1,0 +1,40 @@
+#include <zephyr/dt-bindings/gpio/gpio.h>
+
+&uicr {
+    nfct-pins-as-gpios;
+};
+
+/ {
+    chosen {
+        zmk,kscan = &kscan0;
+    };
+
+    kscan0: kscan0 {
+        compatible = "zmk,kscan-gpio-direct";
+        status = "okay";
+        wakeup-source;
+        input-gpios =
+            <&gpio0 2  (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>, /* D0  P0.02 */
+            <&gpio0 3  (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>, /* D1  P0.03 */
+            <&gpio0 28 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>, /* D2  P0.28 */
+            <&gpio0 29 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>, /* D3  P0.29 */
+            <&gpio0 4  (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>, /* D4  P0.04 */
+            <&gpio0 5  (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>, /* D5  P0.05 */
+            <&gpio1 11 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>, /* D6  P1.11 */
+            <&gpio1 12 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>, /* D7  P1.12 */
+            <&gpio1 13 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>; /* D8  P1.13 */
+    };
+
+    ec11_right: ec11_right {
+        compatible = "alps,ec11";
+        a-gpios = <&gpio1 14 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>; /* D9  P1.14 */
+        b-gpios = <&gpio1 15 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>; /* D10 P1.15 */
+        steps = <24>;
+        status = "okay";
+    };
+
+    sensors: sensors {
+        compatible = "zmk,keymap-sensors";
+        sensors = <&ec11_right>;
+    };
+};

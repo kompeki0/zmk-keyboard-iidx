@@ -1,0 +1,9 @@
+file_format: "1"
+id: sdvx
+name: SDVX Controller
+type: shield
+requires:
+  - xiao_ble
+features:
+  - keys
+  - encoders

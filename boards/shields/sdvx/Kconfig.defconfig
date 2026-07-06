@@ -1,0 +1,6 @@
+if SHIELD_SDVX
+
+config ZMK_KEYBOARD_NAME
+    default "SDVX Controller"
+
+endif
