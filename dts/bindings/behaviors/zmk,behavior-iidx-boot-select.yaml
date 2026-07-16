@@ -1,0 +1,19 @@
+# Copyright (c) 2026 The zmk-iidx contributors
+# SPDX-License-Identifier: MIT
+
+description: Select IIDX mode when held during boot, otherwise invoke a normal behavior
+
+compatible: "zmk,behavior-iidx-boot-select"
+
+include: zero_param.yaml
+
+properties:
+  bindings:
+    type: phandle-array
+    required: true
+    description: Two bindings; IIDX mode switch first and normal fallback second
+
+  boot-timeout-ms:
+    type: int
+    default: 1000
+    description: Presses at or before this uptime select IIDX mode

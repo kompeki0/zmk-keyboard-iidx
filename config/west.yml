@@ -23,10 +23,5 @@ manifest:
       remote: kompeki0
       revision: main
       clone-depth: 1
-    - name: zmk-iidx
-      remote: kompeki0
-      revision: main
-      clone-depth: 1
-    
   self:
     path: config

@@ -1,0 +1,19 @@
+# Copyright (c) 2026 The zmk-iidx contributors
+# SPDX-License-Identifier: MIT
+
+description: Toggle between an IIDX layer and a standard USB keyboard layer
+
+compatible: "zmk,behavior-iidx-mode"
+
+include: zero_param.yaml
+
+properties:
+  iidx-layer:
+    type: int
+    required: true
+    description: Layer to activate in IIDX mode
+
+  keyboard-layer:
+    type: int
+    required: true
+    description: Layer to activate in standard keyboard mode

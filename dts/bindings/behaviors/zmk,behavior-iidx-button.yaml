@@ -1,0 +1,8 @@
+# Copyright (c) 2026 The zmk-iidx contributors
+# SPDX-License-Identifier: MIT
+
+description: IIDX dedicated HID button press/release behavior
+
+compatible: "zmk,behavior-iidx-button"
+
+include: one_param.yaml
