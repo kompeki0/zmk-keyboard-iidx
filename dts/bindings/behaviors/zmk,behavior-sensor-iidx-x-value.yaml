@@ -1,0 +1,28 @@
+description: Adjust a stored value from a sensor and send it as the IIDX X axis
+
+compatible: "zmk,behavior-sensor-iidx-x-value"
+
+include: zero_param.yaml
+
+properties:
+  "#sensor-binding-cells":
+    type: int
+    required: true
+    const: 0
+  index:
+    type: int
+    required: true
+  min:
+    type: int
+    default: -127
+  max:
+    type: int
+    default: 127
+  step:
+    type: int
+    default: 1
+  ticks-per-step:
+    type: int
+    default: 1
+  continuous:
+    type: boolean

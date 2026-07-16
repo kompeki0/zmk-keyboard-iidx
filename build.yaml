@@ -20,12 +20,10 @@
 ---
 include:
   - board: xiao_ble
-    shield: sdvx
+    shield: iidx
     cmake-args: -DKCONFIG_ERROR_ON_WARNINGS=OFF
-    artifact-name: sdvx
-  - board: xiao_ble
-    shield: tester_xiao
-    artifact-name: tester_xiao
+    artifact-name: iidx
   - board: xiao_ble
     shield: settings_reset
     artifact-name: settings_reset
+

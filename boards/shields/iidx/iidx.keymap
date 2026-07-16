@@ -1,0 +1,74 @@
+#include <behaviors.dtsi>
+#include <dt-bindings/zmk/keys.h>
+
+/ {
+    behaviors {
+        iidx_btn: iidx_button {
+            compatible = "zmk,behavior-iidx-button";
+            #binding-cells = <1>;
+        };
+
+        iidx_mode: iidx_mode {
+            compatible = "zmk,behavior-iidx-mode";
+            #binding-cells = <0>;
+            iidx-layer = <1>;
+            keyboard-layer = <0>;
+        };
+
+        iidx_boot: iidx_boot {
+            compatible = "zmk,behavior-iidx-boot-select";
+            #binding-cells = <0>;
+            bindings = <&iidx_mode>, <&kp Z>;
+            boot-timeout-ms = <1000>;
+        };
+
+        enc_hold_r: enc_hold {
+            compatible = "zmk,behavior-sensor-hold-step-rotate";
+            #sensor-binding-cells = <0>;
+            step-group-size = <0>;
+            timeout-ms = <200>;
+            direction-hold-mode = <0>;
+
+            require-top-layer;
+
+            bindings = <
+                &kp LCTRL   /* hold_cw  */
+                &kp LSHFT   /* hold_ccw */
+                &none    /* step_cw  */
+                &none   /* step_ccw */
+            >;
+        };
+
+        enc_iidx_x: enc_iidx_x {
+            compatible = "zmk,behavior-sensor-iidx-x-value";
+            #sensor-binding-cells = <0>;
+
+            index = <0>;
+            min = <-127>;
+            max = <127>;
+            step = <-1>;
+            ticks-per-step = <1>;
+            continuous;
+        };
+    };
+
+    keymap {
+        compatible = "zmk,keymap";
+
+        keyboard_layer {
+            bindings = <
+                &iidx_boot &kp S &kp X &kp D &kp C
+                &kp F &kp V &kp Q &kp W
+            >;
+            sensor-bindings = <&enc_hold>;
+        };
+
+        iidx_layer {
+            bindings = <
+                &iidx_btn 0 &iidx_btn 1 &iidx_btn 2 &iidx_btn 3 &iidx_btn 4
+                &iidx_btn 5 &iidx_btn 6 &iidx_btn 8 &iidx_btn 9
+            >;
+            sensor-bindings = <&enc_iidx_x>;
+        };
+    };
+};

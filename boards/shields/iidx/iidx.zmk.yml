@@ -1,6 +1,6 @@
 file_format: "1"
-id: sdvx
-name: SDVX Controller
+id: iidx
+name: IIDX Controller
 type: shield
 requires:
   - xiao_ble

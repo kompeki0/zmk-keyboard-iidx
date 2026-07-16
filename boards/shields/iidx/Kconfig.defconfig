@@ -1,0 +1,6 @@
+if SHIELD_IIDX
+
+config ZMK_KEYBOARD_NAME
+    default "IIDX Controller"
+
+endif
