@@ -32,7 +32,7 @@
 
             bindings = <
                 &iidx_btn 8   /* hold_cw  */
-                &iidx_btn 7   /* hold_ccw */
+                &iidx_btn 9   /* hold_ccw */
                 &none    /* step_cw  */
                 &none   /* step_ccw */
             >;
@@ -57,7 +57,7 @@
         bms_layer {
             bindings = <
                 &iidx_boot &iidx_btn 1 &iidx_btn 2 &iidx_btn 3 &iidx_btn 4
-                &iidx_btn 5 &iidx_btn 6 &iidx_btn 9 &iidx_btn 10
+                &iidx_btn 5 &iidx_btn 6 &iidx_btn 10 &iidx_btn 11
             >;
             sensor-bindings = <&enc_hold>;
         };
