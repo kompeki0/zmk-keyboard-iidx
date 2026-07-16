@@ -44,9 +44,9 @@
             #sensor-binding-cells = <0>;
 
             index = <0>;
-            min = <-127>;
+            min = <(-127)>;
             max = <127>;
-            step = <-1>;
+            step = <(-1)>;
             ticks-per-step = <1>;
             continuous;
         };
