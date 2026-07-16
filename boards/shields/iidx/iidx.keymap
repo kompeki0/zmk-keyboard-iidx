@@ -12,7 +12,6 @@
             compatible = "zmk,behavior-iidx-mode";
             #binding-cells = <0>;
             iidx-layers = <0 1>;
-            default-iidx-mode;
         };
 
         iidx_boot: iidx_boot {
@@ -55,7 +54,7 @@
     keymap {
         compatible = "zmk,keymap";
 
-        keyboard_layer {
+        bms_layer {
             bindings = <
                 &iidx_boot &iidx_btn 1 &iidx_btn 2 &iidx_btn 3 &iidx_btn 4
                 &iidx_btn 5 &iidx_btn 6 &iidx_btn 9 &iidx_btn 10
