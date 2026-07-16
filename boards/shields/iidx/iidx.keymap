@@ -11,8 +11,8 @@
         iidx_mode: iidx_mode {
             compatible = "zmk,behavior-iidx-mode";
             #binding-cells = <0>;
-            iidx-layer = <1>;
-            keyboard-layer = <0>;
+            iidx-layers = <0 1>;
+            default-iidx-mode;
         };
 
         iidx_boot: iidx_boot {

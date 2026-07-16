@@ -22,14 +22,54 @@
 
 LOG_MODULE_DECLARE(zmk_iidx_hid, CONFIG_ZMK_LOG_LEVEL);
 
+#define LAYER_PROP_ELEM(idx, inst, prop) DT_INST_PROP_BY_IDX(inst, prop, idx)
+#define LAYER_PROP_LIST(inst, prop) LISTIFY(DT_INST_PROP_LEN(inst, prop), LAYER_PROP_ELEM, (,), inst, prop)
+#define IIDX_LAYER_COUNT(inst)                                                                    \
+    COND_CODE_1(DT_INST_NODE_HAS_PROP(inst, iidx_layers), (DT_INST_PROP_LEN(inst, iidx_layers)), \
+                (COND_CODE_1(DT_INST_NODE_HAS_PROP(inst, iidx_layer), (1), (0))))
+#define KEYBOARD_LAYER_COUNT(inst)                                                                     \
+    COND_CODE_1(DT_INST_NODE_HAS_PROP(inst, keyboard_layers), (DT_INST_PROP_LEN(inst, keyboard_layers)), \
+                (COND_CODE_1(DT_INST_NODE_HAS_PROP(inst, keyboard_layer), (1), (0))))
+#define IIDX_LAYER_INIT(inst)                                                                         \
+    COND_CODE_1(DT_INST_NODE_HAS_PROP(inst, iidx_layers), ((zmk_keymap_layer_id_t[]){LAYER_PROP_LIST(inst, iidx_layers)}), \
+                (COND_CODE_1(DT_INST_NODE_HAS_PROP(inst, iidx_layer), ((zmk_keymap_layer_id_t[]){DT_INST_PROP(inst, iidx_layer)}), \
+                              ((zmk_keymap_layer_id_t[]){0}))))
+#define KEYBOARD_LAYER_INIT(inst)                                                                          \
+    COND_CODE_1(DT_INST_NODE_HAS_PROP(inst, keyboard_layers), ((zmk_keymap_layer_id_t[]){LAYER_PROP_LIST(inst, keyboard_layers)}), \
+                (COND_CODE_1(DT_INST_NODE_HAS_PROP(inst, keyboard_layer), ((zmk_keymap_layer_id_t[]){DT_INST_PROP(inst, keyboard_layer)}), \
+                              ((zmk_keymap_layer_id_t[]){0}))))
+
 struct behavior_iidx_mode_config {
-    zmk_keymap_layer_id_t iidx_layer;
-    zmk_keymap_layer_id_t keyboard_layer;
+    const zmk_keymap_layer_id_t *iidx_layers;
+    size_t iidx_layer_count;
+    const zmk_keymap_layer_id_t *keyboard_layers;
+    size_t keyboard_layer_count;
+    bool default_iidx_mode;
 };
 
 static atomic_t iidx_mode_active;
 
 bool zmk_iidx_mode_is_active(void) { return atomic_get(&iidx_mode_active) != 0; }
+
+static int apply_layer_set(const zmk_keymap_layer_id_t *layers, size_t count) {
+    int err = 0;
+
+    for (zmk_keymap_layer_id_t i = 0; i < ZMK_KEYMAP_LAYERS_LEN; i++) {
+        int rc = zmk_keymap_layer_deactivate(i, false);
+        if (rc < 0 && err == 0) {
+            err = rc;
+        }
+    }
+
+    for (size_t i = 0; i < count; i++) {
+        int rc = zmk_keymap_layer_activate(layers[i], false);
+        if (rc < 0 && err == 0) {
+            err = rc;
+        }
+    }
+
+    return err;
+}
 
 static void clear_standard_usb_reports(void) {
     zmk_hid_keyboard_clear();
@@ -64,10 +104,13 @@ static int on_pressed(struct zmk_behavior_binding *binding,
     clear_standard_usb_reports();
 
     atomic_set(&iidx_mode_active, enable_iidx);
-    zmk_keymap_layer_id_t layer = enable_iidx ? config->iidx_layer : config->keyboard_layer;
+    const zmk_keymap_layer_id_t *layers =
+        enable_iidx ? config->iidx_layers : config->keyboard_layers;
+    size_t layer_count = enable_iidx ? config->iidx_layer_count : config->keyboard_layer_count;
 
-    LOG_INF("Switching to %s mode on layer %u", enable_iidx ? "IIDX" : "keyboard", layer);
-    err = zmk_keymap_layer_to(layer, false);
+    LOG_INF("Switching to %s mode with %u layer(s)", enable_iidx ? "IIDX" : "keyboard",
+            (unsigned int)layer_count);
+    err = apply_layer_set(layers, layer_count);
     return err < 0 ? err : ZMK_BEHAVIOR_OPAQUE;
 }
 
@@ -84,12 +127,30 @@ static const struct behavior_driver_api behavior_iidx_mode_driver_api = {
 #endif
 };
 
+static int behavior_iidx_mode_init(const struct device *dev) {
+    const struct behavior_iidx_mode_config *config = dev->config;
+
+    if (config->default_iidx_mode) {
+        atomic_set(&iidx_mode_active, true);
+        return apply_layer_set(config->iidx_layers, config->iidx_layer_count);
+    }
+
+    atomic_set(&iidx_mode_active, false);
+    return 0;
+}
+
 #define IIDX_MODE_INST(n)                                                                         \
+    BUILD_ASSERT(IIDX_LAYER_COUNT(n) > 0,                                                         \
+                 "IIDX mode requires at least one iidx-layer or iidx-layers entry");              \
     static const struct behavior_iidx_mode_config behavior_iidx_mode_config_##n = {              \
-        .iidx_layer = DT_INST_PROP(n, iidx_layer),                                                \
-        .keyboard_layer = DT_INST_PROP(n, keyboard_layer),                                        \
+        .iidx_layers = IIDX_LAYER_INIT(n),                                                        \
+        .iidx_layer_count = IIDX_LAYER_COUNT(n),                                                  \
+        .keyboard_layers = KEYBOARD_LAYER_INIT(n),                                                \
+        .keyboard_layer_count = KEYBOARD_LAYER_COUNT(n),                                          \
+        .default_iidx_mode = DT_INST_PROP_OR(n, default_iidx_mode, 0),                           \
     };                                                                                            \
-    BEHAVIOR_DT_INST_DEFINE(n, NULL, NULL, NULL, &behavior_iidx_mode_config_##n, POST_KERNEL,     \
+    BEHAVIOR_DT_INST_DEFINE(n, behavior_iidx_mode_init, NULL, NULL,                              \
+                            &behavior_iidx_mode_config_##n, POST_KERNEL,                          \
                             CONFIG_KERNEL_INIT_PRIORITY_DEFAULT,                                  \
                             &behavior_iidx_mode_driver_api);
 
