@@ -10,7 +10,7 @@
             compatible = "zmk,behavior-sensor-hold-step-rotate";
             #sensor-binding-cells = <0>;
             step-group-size = <0>;
-            timeout-ms = <200>;
+            timeout-ms = <50>;
             direction-hold-mode = <0>;
 
             require-top-layer;
