@@ -47,9 +47,29 @@ struct behavior_iidx_mode_config {
     bool default_iidx_mode;
 };
 
-static atomic_t iidx_mode_active;
+static const zmk_keymap_layer_id_t *active_iidx_layers;
+static size_t active_iidx_layer_count;
 
-bool zmk_iidx_mode_is_active(void) { return atomic_get(&iidx_mode_active) != 0; }
+static bool layer_in_set(zmk_keymap_layer_id_t layer, const zmk_keymap_layer_id_t *layers,
+                         size_t count) {
+    for (size_t i = 0; i < count; i++) {
+        if (layers[i] == layer) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool zmk_iidx_mode_is_active(void) {
+    if (active_iidx_layers == NULL || active_iidx_layer_count == 0) {
+        return false;
+    }
+
+    zmk_keymap_layer_index_t top_index = zmk_keymap_highest_layer_active();
+    zmk_keymap_layer_id_t top_layer = zmk_keymap_layer_index_to_id(top_index);
+    return layer_in_set(top_layer, active_iidx_layers, active_iidx_layer_count);
+}
 
 static int apply_layer_set(const zmk_keymap_layer_id_t *layers, size_t count) {
     int err = 0;
@@ -103,7 +123,6 @@ static int on_pressed(struct zmk_behavior_binding *binding,
     }
     clear_standard_usb_reports();
 
-    atomic_set(&iidx_mode_active, enable_iidx);
     const zmk_keymap_layer_id_t *layers =
         enable_iidx ? config->iidx_layers : config->keyboard_layers;
     size_t layer_count = enable_iidx ? config->iidx_layer_count : config->keyboard_layer_count;
@@ -129,13 +148,13 @@ static const struct behavior_driver_api behavior_iidx_mode_driver_api = {
 
 static int behavior_iidx_mode_init(const struct device *dev) {
     const struct behavior_iidx_mode_config *config = dev->config;
+    active_iidx_layers = config->iidx_layers;
+    active_iidx_layer_count = config->iidx_layer_count;
 
     if (config->default_iidx_mode) {
-        atomic_set(&iidx_mode_active, true);
         return apply_layer_set(config->iidx_layers, config->iidx_layer_count);
     }
 
-    atomic_set(&iidx_mode_active, false);
     return 0;
 }
 

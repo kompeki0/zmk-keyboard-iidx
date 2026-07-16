@@ -17,7 +17,7 @@
         iidx_boot: iidx_boot {
             compatible = "zmk,behavior-iidx-boot-select";
             #binding-cells = <0>;
-            bindings = <&iidx_mode>, <&iidx_btn 0>;
+            bindings = <&to 1>, <&iidx_btn 0>;
             boot-timeout-ms = <1000>;
         };
 
