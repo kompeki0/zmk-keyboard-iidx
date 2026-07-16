@@ -18,7 +18,7 @@
         iidx_boot: iidx_boot {
             compatible = "zmk,behavior-iidx-boot-select";
             #binding-cells = <0>;
-            bindings = <&iidx_mode>, <&kp Z>;
+            bindings = <&iidx_mode>, <&iidx_btn 0>;
             boot-timeout-ms = <1000>;
         };
 
@@ -57,7 +57,7 @@
 
         keyboard_layer {
             bindings = <
-                &iidx_btn 0 &iidx_btn 1 &iidx_btn 2 &iidx_btn 3 &iidx_btn 4
+                &iidx_boot &iidx_btn 1 &iidx_btn 2 &iidx_btn 3 &iidx_btn 4
                 &iidx_btn 5 &iidx_btn 6 &iidx_btn 9 &iidx_btn 10
             >;
             sensor-bindings = <&enc_hold>;
