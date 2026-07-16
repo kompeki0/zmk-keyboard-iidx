@@ -32,8 +32,8 @@
             require-top-layer;
 
             bindings = <
-                &kp LCTRL   /* hold_cw  */
-                &kp LSHFT   /* hold_ccw */
+                &iidx_btn 8   /* hold_cw  */
+                &iidx_btn 7   /* hold_ccw */
                 &none    /* step_cw  */
                 &none   /* step_ccw */
             >;
@@ -46,7 +46,7 @@
             index = <0>;
             min = <(-127)>;
             max = <127>;
-            step = <(-1)>;
+            step = <(-5)>;
             ticks-per-step = <1>;
             continuous;
         };
@@ -57,8 +57,8 @@
 
         keyboard_layer {
             bindings = <
-                &iidx_boot &kp S &kp X &kp D &kp C
-                &kp F &kp V &kp Q &kp W
+                &iidx_btn 0 &iidx_btn 1 &iidx_btn 2 &iidx_btn 3 &iidx_btn 4
+                &iidx_btn 5 &iidx_btn 6 &iidx_btn 9 &iidx_btn 10
             >;
             sensor-bindings = <&enc_hold>;
         };
