@@ -13,18 +13,12 @@
 
 #include <zmk/behavior.h>
 #include <zmk/events/position_state_changed.h>
+#include <zmk/keymap.h>
+#include <zmk/sensors.h>
 #include <zmk/virtual_key_position.h>
 #include <zmk_iidx/hid.h>
 
 #include "zmk_value_store.h"
-
-#ifndef ZMK_KEYMAP_SENSORS_LEN
-#define ZMK_KEYMAP_SENSORS_LEN 0
-#endif
-
-#ifndef ZMK_KEYMAP_LAYERS_LEN
-#define ZMK_KEYMAP_LAYERS_LEN 1
-#endif
 
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
