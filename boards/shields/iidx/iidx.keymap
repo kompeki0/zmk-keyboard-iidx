@@ -22,7 +22,7 @@
             boot-timeout-ms = <1000>;
         };
 
-        enc_hold_r: enc_hold {
+        enc_hold: enc_hold {
             compatible = "zmk,behavior-sensor-hold-step-rotate";
             #sensor-binding-cells = <0>;
             step-group-size = <0>;
