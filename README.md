@@ -30,6 +30,12 @@ vendor serviceには互換性のため次のcharacteristicを用意していま�
 advertising packetにはbeatble互換のApple iBeacon manufacturer dataを設定し、scan
 responseには`0xFF00`のComplete 16-bit Service UUIDと`IIDX Entry model`を設定します。
 `0xFF01`の10-byte input packetは8ms周期（約125回/秒）で通知します。
+sequenceは`01/02`から始まり、通知ごとに2増加します。現在使用するoption buttonは
+E1/E2ですが、送信形式と内部HID reportは将来のE3/E4にも対応しています。
+
+BLEの有効化そのものはkeymap layerを変更しません。通常起動時は先頭の`bms_layer`が
+有効で、皿はE1/E2として動作します。起動後1秒以内に第1ボタンを押して
+`iidx_layer`へ移動した場合、皿はX軸値として動作します。
 
 ## Bluetooth settings
 

@@ -110,7 +110,8 @@ static void notify_work_handler(struct k_work *work) {
     zmk_iidx_hid_get_report(&report);
 
     uint8_t buttons = (uint8_t)(report.keys_1_7 & 0x7F);
-    uint8_t effectors = (uint8_t)(report.keys_e1_e4 & 0x03);
+    /* E1/E2 are used by the current controller; keep E3/E4 available for expansion. */
+    uint8_t effectors = (uint8_t)(report.keys_e1_e4 & 0x0F);
     uint8_t packet[10] = {
         (uint8_t)report.x,
         0x00,
@@ -130,7 +131,7 @@ static void notify_work_handler(struct k_work *work) {
         LOG_DBG("Failed IIDX BLE input notification: %d", err);
     }
 
-    sequence++;
+    sequence += 2;
 }
 
 K_WORK_DEFINE(notify_work, notify_work_handler);
