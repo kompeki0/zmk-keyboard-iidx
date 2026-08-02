@@ -7,7 +7,7 @@ vendor BLE serviceをこのZephyrモジュール内に統合しています。
 ## IIDX transport
 
 - USB: report IDなしの5-byte joystick reportを`HID_1`から送信
-- BLE（オプション）: `0xFF00` service / `0xFF01` notify characteristicから送信
+- BLE（オプション）: `0xFF00` vendor serviceから送信
 
 BLE transportを使用する場合はshield設定に次を追加します。
 
@@ -20,6 +20,12 @@ USB IIDX HIDのみが有効です。
 
 BLEデバイス名は16文字の`IIDX Entry model`です。Zephyrの終端文字を含むバッファ要件に
 合わせて`CONFIG_BT_DEVICE_NAME_MAX=17`を指定しています。
+
+vendor serviceには互換性のため次のcharacteristicを用意しています。
+
+- `0xFF01`: 2つの5-byte input recordを連結した10-byte notify
+- `0xFF02`: write / write without response
+- `0xFF03`: notify / write。notify購読開始時に`01 05`を送信
 
 ## Bluetooth settings
 

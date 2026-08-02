@@ -28,9 +28,10 @@ menuconfig ZMK_IIDX_BLE
     bool "IIDX Entry model compatible vendor BLE service"
     depends on ZMK_BLE
     help
-      Add the 16-bit 0xFF00 primary service with a notify-only 0xFF01
-      characteristic. While IIDX mode is active and USB is disconnected,
-      two five-byte notifications are sent per frame.
+      Add the 16-bit 0xFF00 primary service with 0xFF01, 0xFF02, and 0xFF03
+      characteristics. While IIDX mode is active and USB is disconnected,
+      one ten-byte 0xFF01 notification containing two input records is sent
+      per frame.
 
 if ZMK_IIDX_BLE
 
@@ -39,8 +40,7 @@ config ZMK_IIDX_BLE_FRAME_INTERVAL_US
     range 1000 1000000
     default 16667
     help
-      16667 microseconds produces approximately 60 frames per second. Each
-      frame contains two notifications, for approximately 120 notifications
+      16667 microseconds produces approximately 60 ten-byte notifications
       per second.
 
 config ZMK_IIDX_BLE_CONN_INTERVAL
