@@ -18,6 +18,9 @@ CONFIG_ZMK_IIDX_BLE=y
 BLEはUSB HID接続中にはnotifyを停止し、USBを優先します。未指定時は従来どおり
 USB IIDX HIDのみが有効です。
 
+BLEデバイス名は16文字の`IIDX Entry model`です。Zephyrの終端文字を含むバッファ要件に
+合わせて`CONFIG_BT_DEVICE_NAME_MAX=17`を指定しています。
+
 ## Bluetooth settings
 
 電源投入後1秒以内に第2ボタンを押すとBluetooth設定レイヤへ移動します。通常起動後の
