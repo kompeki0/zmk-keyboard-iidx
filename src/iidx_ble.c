@@ -17,6 +17,7 @@
 #include <zmk/ble.h>
 #include <zmk/endpoints.h>
 #include <zmk/event_manager.h>
+#include <zmk/events/endpoint_changed.h>
 #include <zmk/events/usb_conn_state_changed.h>
 #include <zmk/usb.h>
 #include <zmk_iidx/ble.h>
@@ -95,8 +96,10 @@ BT_GATT_SERVICE_DEFINE(
     BT_GATT_CCC(iidx_ble_unknown_3_ccc_changed, BT_GATT_PERM_READ | BT_GATT_PERM_WRITE));
 
 static bool should_notify(void) {
+    struct zmk_endpoint_instance preferred = zmk_endpoint_get_preferred();
+
     return atomic_get(&notifications_enabled) != 0 && zmk_iidx_mode_is_active() &&
-           !zmk_usb_is_hid_ready();
+           (preferred.transport == ZMK_TRANSPORT_BLE || !zmk_usb_is_hid_ready());
 }
 
 static void notify_work_handler(struct k_work *work) {
@@ -275,19 +278,22 @@ static int usb_conn_state_listener(const zmk_event_t *eh) {
         return ZMK_EV_EVENT_BUBBLE;
     }
 
-    if (event->conn_state == ZMK_USB_CONN_HID) {
-        struct zmk_endpoint_instance preferred = zmk_endpoint_get_preferred();
-        if (preferred.transport != ZMK_TRANSPORT_USB) {
-            int err = zmk_endpoint_set_preferred_transport(ZMK_TRANSPORT_USB);
-            if (err != 0) {
-                LOG_WRN("Failed to prefer USB transport: %d", err);
-            }
-        }
-    }
-
     update_notify_timer();
     return ZMK_EV_EVENT_BUBBLE;
 }
 
 ZMK_LISTENER(zmk_iidx_ble_usb, usb_conn_state_listener);
 ZMK_SUBSCRIPTION(zmk_iidx_ble_usb, zmk_usb_conn_state_changed);
+
+static int endpoint_changed_listener(const zmk_event_t *eh) {
+    const struct zmk_endpoint_changed *event = as_zmk_endpoint_changed(eh);
+    if (event == NULL) {
+        return ZMK_EV_EVENT_BUBBLE;
+    }
+
+    update_notify_timer();
+    return ZMK_EV_EVENT_BUBBLE;
+}
+
+ZMK_LISTENER(zmk_iidx_ble_endpoint, endpoint_changed_listener);
+ZMK_SUBSCRIPTION(zmk_iidx_ble_endpoint, zmk_endpoint_changed);
