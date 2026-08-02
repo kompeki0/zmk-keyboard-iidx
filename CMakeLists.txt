@@ -12,6 +12,8 @@ if((NOT CONFIG_ZMK_SPLIT) OR CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
       src/behavior_iidx_button.c
       src/behavior_iidx_mode.c
     )
+
+    target_sources_ifdef(CONFIG_ZMK_IIDX_BLE app PRIVATE src/iidx_ble.c)
   endif()
 
   zephyr_include_directories(include)

@@ -17,6 +17,9 @@
 #include <zmk/hid.h>
 #include <zmk/keymap.h>
 #include <zmk/usb_hid.h>
+#if IS_ENABLED(CONFIG_ZMK_IIDX_BLE)
+#include <zmk_iidx/ble.h>
+#endif
 #include <zmk_iidx/hid.h>
 #include <zmk_iidx/mode.h>
 
@@ -130,6 +133,11 @@ static int on_pressed(struct zmk_behavior_binding *binding,
     LOG_INF("Switching to %s mode with %u layer(s)", enable_iidx ? "IIDX" : "keyboard",
             (unsigned int)layer_count);
     err = apply_layer_set(layers, layer_count);
+
+#if IS_ENABLED(CONFIG_ZMK_IIDX_BLE)
+    zmk_iidx_ble_mode_changed(zmk_iidx_mode_is_active());
+#endif
+
     return err < 0 ? err : ZMK_BEHAVIOR_OPAQUE;
 }
 

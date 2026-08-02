@@ -34,6 +34,9 @@ int zmk_iidx_hid_set_axes(int16_t x, int16_t y);
 int zmk_iidx_hid_send(void);
 int zmk_iidx_hid_clear(void);
 
+/** Copy a sanitized snapshot of the current five-byte report. */
+void zmk_iidx_hid_get_report(struct zmk_iidx_hid_report *report);
+
 #ifdef __cplusplus
 }
 #endif

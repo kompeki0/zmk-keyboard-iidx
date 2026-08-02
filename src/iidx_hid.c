@@ -118,6 +118,17 @@ int zmk_iidx_hid_clear(void) {
     return zmk_iidx_hid_send();
 }
 
+void zmk_iidx_hid_get_report(struct zmk_iidx_hid_report *report) {
+    if (report == NULL) {
+        return;
+    }
+
+    k_mutex_lock(&report_mutex, K_FOREVER);
+    *report = current_report;
+    sanitize_report(report);
+    k_mutex_unlock(&report_mutex);
+}
+
 int zmk_iidx_hid_set_button(uint8_t bit, bool pressed) {
     if (!zmk_iidx_mode_is_active()) {
         return -EACCES;

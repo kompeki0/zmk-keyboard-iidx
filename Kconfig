@@ -24,6 +24,42 @@ config USB_HID_DEVICE_COUNT
     default 2 if ZMK_IIDX_HID
     range 2 2 if ZMK_IIDX_HID
 
+menuconfig ZMK_IIDX_BLE
+    bool "IIDX Entry model compatible vendor BLE service"
+    depends on ZMK_BLE
+    help
+      Add the 16-bit 0xFF00 primary service with a notify-only 0xFF01
+      characteristic. While IIDX mode is active and USB is disconnected,
+      two five-byte notifications are sent per frame.
+
+if ZMK_IIDX_BLE
+
+config ZMK_IIDX_BLE_FRAME_INTERVAL_US
+    int "IIDX BLE frame interval in microseconds"
+    range 1000 1000000
+    default 16667
+    help
+      16667 microseconds produces approximately 60 frames per second. Each
+      frame contains two notifications, for approximately 120 notifications
+      per second.
+
+config ZMK_IIDX_BLE_CONN_INTERVAL
+    int "Requested BLE connection interval"
+    range 6 3200
+    default 6
+    help
+      BLE connection interval in 1.25 millisecond units. The default requests
+      7.5 milliseconds. The central device makes the final decision.
+
+config ZMK_IIDX_BLE_CONN_TIMEOUT
+    int "Requested BLE supervision timeout"
+    range 10 3200
+    default 400
+    help
+      BLE supervision timeout in 10 millisecond units.
+
+endif
+
 endif
 
 config ZMK_VALUE_STORE_SIZE
