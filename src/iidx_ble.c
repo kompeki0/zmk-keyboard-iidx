@@ -5,9 +5,11 @@
 
 #include <errno.h>
 
+#include <zephyr/bluetooth/bluetooth.h>
 #include <zephyr/bluetooth/conn.h>
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/bluetooth/uuid.h>
+#include <zephyr/init.h>
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/sys/atomic.h>
@@ -30,6 +32,36 @@ LOG_MODULE_DECLARE(zmk_iidx_hid, CONFIG_ZMK_LOG_LEVEL);
 
 #define IIDX_BLE_KEY_INPUT_ATTR_INDEX 1
 #define IIDX_BLE_UNKNOWN_3_ATTR_INDEX 6
+#define IIDX_BLE_ADV_INITIAL_DELAY_MS 1000
+#define IIDX_BLE_ADV_RETRY_MS 250
+#define IIDX_BLE_ADV_RESTART_MS 100
+
+/*
+ * Match beatble's legacy advertising payload exactly:
+ *   Flags
+ *   Apple manufacturer data containing an iBeacon record
+ *
+ * The scan response contains the complete FF00 service UUID and local name.
+ */
+static const uint8_t iidx_ble_ibeacon_data[] = {
+    0x4C, 0x00, /* Apple company identifier */
+    0x02, 0x15, /* iBeacon type and payload length */
+    0xFD, 0xA5, 0x06, 0x93, 0xA4, 0xE2, 0x4F, 0xB1,
+    0xAF, 0xCF, 0xC6, 0xEB, 0x07, 0x64, 0x78, 0x25, /* proximity UUID */
+    0x27, 0x44, /* major */
+    0x8B, 0xE9, /* minor */
+    0xC5,       /* measured power: -59 dBm */
+};
+
+static const struct bt_data iidx_ble_ad[] = {
+    BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
+    BT_DATA(BT_DATA_MANUFACTURER_DATA, iidx_ble_ibeacon_data, sizeof(iidx_ble_ibeacon_data)),
+};
+
+static const struct bt_data iidx_ble_sd[] = {
+    BT_DATA_BYTES(BT_DATA_UUID16_ALL, BT_UUID_16_ENCODE(0xFF00)),
+    BT_DATA(BT_DATA_NAME_COMPLETE, CONFIG_BT_DEVICE_NAME, sizeof(CONFIG_BT_DEVICE_NAME) - 1),
+};
 
 static atomic_t notifications_enabled;
 static atomic_t unknown_3_notifications_enabled;
@@ -119,6 +151,59 @@ static void unknown_3_notify_work_handler(struct k_work *work) {
 }
 
 K_WORK_DEFINE(unknown_3_notify_work, unknown_3_notify_work_handler);
+
+static void iidx_ble_advertising_work_handler(struct k_work *work) {
+    ARG_UNUSED(work);
+
+    int err = bt_le_adv_stop();
+    if (err != 0 && err != -EALREADY) {
+        LOG_DBG("Failed to stop ZMK advertising before IIDX override: %d", err);
+    }
+
+    const struct bt_le_adv_param *adv_param =
+        BT_LE_ADV_PARAM(BT_LE_ADV_OPT_CONN, BT_GAP_ADV_FAST_INT_MIN_2,
+                        BT_GAP_ADV_FAST_INT_MAX_2, NULL);
+    err = bt_le_adv_start(adv_param, iidx_ble_ad, ARRAY_SIZE(iidx_ble_ad), iidx_ble_sd,
+                          ARRAY_SIZE(iidx_ble_sd));
+    if (err != 0) {
+        LOG_WRN("Failed to start IIDX advertising: %d", err);
+        k_work_reschedule(k_work_delayable_from_work(work), K_MSEC(IIDX_BLE_ADV_RETRY_MS));
+        return;
+    }
+
+    LOG_INF("Advertising IIDX iBeacon and FF00 service");
+}
+
+K_WORK_DELAYABLE_DEFINE(iidx_ble_advertising_work, iidx_ble_advertising_work_handler);
+
+static void iidx_ble_connected(struct bt_conn *conn, uint8_t err) {
+    ARG_UNUSED(conn);
+
+    if (err == 0) {
+        k_work_cancel_delayable(&iidx_ble_advertising_work);
+    } else {
+        k_work_reschedule(&iidx_ble_advertising_work, K_MSEC(IIDX_BLE_ADV_RESTART_MS));
+    }
+}
+
+static void iidx_ble_disconnected(struct bt_conn *conn, uint8_t reason) {
+    ARG_UNUSED(conn);
+    ARG_UNUSED(reason);
+    k_work_reschedule(&iidx_ble_advertising_work, K_MSEC(IIDX_BLE_ADV_RESTART_MS));
+}
+
+static struct bt_conn_cb iidx_ble_conn_callbacks = {
+    .connected = iidx_ble_connected,
+    .disconnected = iidx_ble_disconnected,
+};
+
+static int iidx_ble_advertising_init(void) {
+    bt_conn_cb_register(&iidx_ble_conn_callbacks);
+    k_work_reschedule(&iidx_ble_advertising_work, K_MSEC(IIDX_BLE_ADV_INITIAL_DELAY_MS));
+    return 0;
+}
+
+SYS_INIT(iidx_ble_advertising_init, APPLICATION, CONFIG_APPLICATION_INIT_PRIORITY);
 
 static void notify_timer_handler(struct k_timer *timer) {
     ARG_UNUSED(timer);

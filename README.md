@@ -27,6 +27,10 @@ vendor serviceには互換性のため次のcharacteristicを用意していま�
 - `0xFF02`: write / write without response
 - `0xFF03`: notify / write。notify購読開始時に`01 05`を送信
 
+advertising packetにはbeatble互換のApple iBeacon manufacturer dataを設定し、scan
+responseには`0xFF00`のComplete 16-bit Service UUIDと`IIDX Entry model`を設定します。
+`0xFF01`の10-byte input packetは8ms周期（約125回/秒）で通知します。
+
 ## Bluetooth settings
 
 電源投入後1秒以内に第2ボタンを押すとBluetooth設定レイヤへ移動します。通常起動後の

@@ -38,10 +38,10 @@ if ZMK_IIDX_BLE
 config ZMK_IIDX_BLE_FRAME_INTERVAL_US
     int "IIDX BLE frame interval in microseconds"
     range 1000 1000000
-    default 16667
+    default 8000
     help
-      16667 microseconds produces approximately 60 ten-byte notifications
-      per second.
+      8000 microseconds matches beatble's timer and produces approximately
+      125 ten-byte notifications per second.
 
 config ZMK_IIDX_BLE_CONN_INTERVAL
     int "Requested BLE connection interval"
