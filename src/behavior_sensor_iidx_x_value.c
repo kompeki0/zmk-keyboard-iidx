@@ -17,6 +17,7 @@
 #include <zmk/sensors.h>
 #include <zmk/virtual_key_position.h>
 #include <zmk_iidx/hid.h>
+#include <zmk_iidx/settings.h>
 
 #include "zmk_value_store.h"
 
@@ -135,6 +136,8 @@ static int process(struct zmk_behavior_binding *binding, struct zmk_behavior_bin
 
     struct value_adjust_state *st = &data->st[sensor_index][event.layer];
     uint16_t tps = cfg->ticks_per_step ? cfg->ticks_per_step : 1;
+    int32_t sensitivity = zmk_iidx_settings_get_scratch_sensitivity();
+    int32_t step = cfg->step < 0 ? -sensitivity : sensitivity;
 
     if (d == DIR_CW) {
         st->tick_accum += 1;
@@ -146,20 +149,20 @@ static int process(struct zmk_behavior_binding *binding, struct zmk_behavior_bin
         st->tick_accum -= (int32_t)tps;
 
         int32_t newv = 0;
-        value_store_add_wrapped(cfg->index, cfg->step, cfg->min_v, cfg->max_v, cfg->continuous,
+        value_store_add_wrapped(cfg->index, step, cfg->min_v, cfg->max_v, cfg->continuous,
                                 &newv);
         int rc = zmk_iidx_hid_set_axis(ZMK_IIDX_AXIS_X, newv);
-        LOG_DBG("value[%d] += %d -> %d rc=%d", cfg->index, (int)cfg->step, (int)newv, rc);
+        LOG_DBG("value[%d] += %d -> %d rc=%d", cfg->index, (int)step, (int)newv, rc);
     }
 
     while (st->tick_accum <= -(int32_t)tps) {
         st->tick_accum += (int32_t)tps;
 
         int32_t newv = 0;
-        value_store_add_wrapped(cfg->index, -cfg->step, cfg->min_v, cfg->max_v, cfg->continuous,
+        value_store_add_wrapped(cfg->index, -step, cfg->min_v, cfg->max_v, cfg->continuous,
                                 &newv);
         int rc = zmk_iidx_hid_set_axis(ZMK_IIDX_AXIS_X, newv);
-        LOG_DBG("value[%d] -= %d -> %d rc=%d", cfg->index, (int)cfg->step, (int)newv, rc);
+        LOG_DBG("value[%d] -= %d -> %d rc=%d", cfg->index, (int)step, (int)newv, rc);
     }
 
     return ZMK_BEHAVIOR_OPAQUE;

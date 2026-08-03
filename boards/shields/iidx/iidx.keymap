@@ -2,6 +2,7 @@
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/outputs.h>
+#include <dt-bindings/zmk_iidx/settings.h>
 
 / {
     behaviors {
@@ -58,6 +59,11 @@
             ticks-per-step = <1>;
             continuous;
         };
+
+        iidx_setting: iidx_setting {
+            compatible = "zmk,behavior-iidx-settings";
+            #binding-cells = <1>;
+        };
     };
 
     macros {
@@ -65,6 +71,12 @@
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
             bindings = <&out OUT_BLE>, <&to 1>;
+        };
+
+        scratch_settings: scratch_settings {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&to 3>, <&iidx_setting IIDX_SETTING_SHOW>;
         };
     };
 
@@ -89,7 +101,18 @@
 
         bluetooth_settings_layer {
             bindings = <
-                &bt BT_CLR_ALL &ble_iidx &none &none &none
+                &bt BT_CLR_ALL &ble_iidx &scratch_settings &none &none
+                &none &none &none &none
+            >;
+        };
+
+        iidx_settings_layer {
+            bindings = <
+                &iidx_setting IIDX_SETTING_SENSITIVITY_DOWN
+                &iidx_setting IIDX_SETTING_SENSITIVITY_UP
+                &iidx_setting IIDX_SETTING_SENSITIVITY_RESET
+                &iidx_setting IIDX_SETTING_SHOW
+                &iidx_setting IIDX_SETTING_EXIT
                 &none &none &none &none
             >;
         };

@@ -1,0 +1,9 @@
+# Copyright (c) 2026 The zmk-iidx contributors
+# SPDX-License-Identifier: MIT
+
+description: Adjust and display persistent IIDX controller settings
+
+compatible: "zmk,behavior-iidx-settings"
+
+include: one_param.yaml
+

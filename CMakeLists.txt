@@ -2,6 +2,7 @@ if((NOT CONFIG_ZMK_SPLIT) OR CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
   target_sources(
     app PRIVATE
     src/behavior_sensor_iidx_x_value.c
+    src/iidx_settings.c
   )
 
   if(CONFIG_ZMK_IIDX_HID)
@@ -11,6 +12,7 @@ if((NOT CONFIG_ZMK_SPLIT) OR CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
       src/behavior_iidx_boot_select.c
       src/behavior_iidx_button.c
       src/behavior_iidx_mode.c
+      src/behavior_iidx_settings.c
     )
 
     target_sources_ifdef(CONFIG_ZMK_IIDX_BLE app PRIVATE src/iidx_ble.c)

@@ -29,9 +29,9 @@ menuconfig ZMK_IIDX_BLE
     depends on ZMK_BLE
     help
       Add the 16-bit 0xFF00 primary service with 0xFF01, 0xFF02, and 0xFF03
-      characteristics. While IIDX mode is active and USB is disconnected,
-      one ten-byte 0xFF01 notification containing two input records is sent
-      per frame.
+      characteristics. While IIDX mode is active and BLE is the selected
+      output (or USB is disconnected), one ten-byte 0xFF01 notification
+      containing two input records is sent per frame.
 
 if ZMK_IIDX_BLE
 

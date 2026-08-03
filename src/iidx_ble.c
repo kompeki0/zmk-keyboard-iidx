@@ -18,6 +18,7 @@
 #include <zmk/endpoints.h>
 #include <zmk/event_manager.h>
 #include <zmk/events/endpoint_changed.h>
+#include <zmk/events/layer_state_changed.h>
 #include <zmk/events/usb_conn_state_changed.h>
 #include <zmk/usb.h>
 #include <zmk_iidx/ble.h>
@@ -297,3 +298,16 @@ static int endpoint_changed_listener(const zmk_event_t *eh) {
 
 ZMK_LISTENER(zmk_iidx_ble_endpoint, endpoint_changed_listener);
 ZMK_SUBSCRIPTION(zmk_iidx_ble_endpoint, zmk_endpoint_changed);
+
+static int layer_state_changed_listener(const zmk_event_t *eh) {
+    const struct zmk_layer_state_changed *event = as_zmk_layer_state_changed(eh);
+    if (event == NULL) {
+        return ZMK_EV_EVENT_BUBBLE;
+    }
+
+    update_notify_timer();
+    return ZMK_EV_EVENT_BUBBLE;
+}
+
+ZMK_LISTENER(zmk_iidx_ble_layer, layer_state_changed_listener);
+ZMK_SUBSCRIPTION(zmk_iidx_ble_layer, zmk_layer_state_changed);

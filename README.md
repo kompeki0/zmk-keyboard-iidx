@@ -33,6 +33,11 @@ responseには`0xFF00`のComplete 16-bit Service UUIDと`IIDX Entry model`を設
 sequenceは`01/02`から始まり、通知ごとに2増加します。現在使用するoption buttonは
 E1/E2ですが、送信形式と内部HID reportは将来のE3/E4にも対応しています。
 
+USBのHID poll intervalは4msなので、入力からUSB転送までの待ちは通常0～4msです。
+BLEは8msの通知周期と要求値7.5msのconnection intervalがあるため、ファームウェアから
+無線送信までの待ちは概ね0～15.5ms（平均約8ms）です。central側が別のconnection
+intervalを選択した場合や無線再送、OS・アプリの処理、画面描画によって実測値は増えます。
+
 BLEの有効化そのものはkeymap layerを変更しません。通常起動時は先頭の`bms_layer`が
 有効で、皿はE1/E2として動作します。起動後1秒以内に第1ボタンを押して
 `iidx_layer`へ移動した場合、皿はX軸値として動作します。
@@ -43,6 +48,21 @@ BLEの有効化そのものはkeymap layerを変更しません。通常起動�
 第2ボタンは従来どおりIIDX button 2として動作します。設定レイヤでは第1ボタンを押すと
 `BT_CLR_ALL`を実行し、保存されている全Bluetooth profileのbondを削除します。第2ボタンを
 押すとpreferred outputをBLEへ強制変更し、`iidx_layer`（layer 1）へ移動します。
+
+## Scratch sensitivity settings
+
+Bluetooth設定レイヤの第3ボタンを押すと、皿感度設定レイヤ（layer 3）へ移動します。
+フォーカス中のテキストエディタへ通常のキーボード入力として設定画面を表示するため、
+あらかじめ空のエディタを開いてください。
+
+- 第1ボタン: 感度を1下げる
+- 第2ボタン: 感度を1上げる
+- 第3ボタン: 初期値5へ戻す
+- 第4ボタン: 設定画面を再表示する
+- 第5ボタン: 設定画面を終了して`iidx_layer`へ移動する
+
+感度は1～20で、エンコーダ1 tickあたりのX軸変化量です。回転方向は従来のまま維持され、
+変更は直ちに反映されます。値はZephyr settingsへ保存され、電源を切っても維持されます。
 
 ## Repository layout
 
