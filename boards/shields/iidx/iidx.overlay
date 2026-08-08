@@ -27,8 +27,8 @@
 
     ec11_right: ec11_right {
         compatible = "alps,ec11";
-        a-gpios = <&gpio1 14 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>; /* D9  P1.14 */
-        b-gpios = <&gpio1 15 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>; /* D10 P1.15 */
+        a-gpios = <&gpio1 15 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>; /* D10 P1.15 */
+        b-gpios = <&gpio1 14 (GPIO_PULL_UP | GPIO_ACTIVE_LOW)>; /* D9  P1.14 */
         steps = <24>;
         status = "okay";
     };
